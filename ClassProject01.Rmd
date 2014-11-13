@@ -1,0 +1,71 @@
+---
+title: "Statistical Inference Project 1"
+author: "B"
+date: "Wednesday, November 12, 2014"
+output: html_document
+---
+### Project Requirements
+The exponential distribution can be simulated in R with `rexp(n, lambda)` where lambda is the rate parameter. The mean of exponential distribution is 1/lambda and the standard deviation is also also 1/lambda. Set lambda = 0.2 for all of the simulations. In this simulation, you will investigate the distribution of averages of 40 exponential(0.2)s. Note that you will need to do a thousand or so simulated averages of 40 exponentials.
+
+Illustrate via simulation and associated explanatory text the properties of the distribution of the mean of 40 exponential(0.2)s.  You should:
+
+1. Show where the distribution is centered at and compare it to the theoretical center of the 
+distribution.
+
+2. Show how variable it is and compare it to the theoretical variance of the distribution.
+
+3. Show that the distribution is approximately normal.
+
+Note that for point 3, focus on the difference between the distribution of a large collection of random exponentials and the distribution of a large collection of averages of 40 exponentials. 
+
+### Simulate the Data
+The following code generates the simulated data:
+```{r}
+set.seed(12345)
+lambda <- 0.2
+numsims <- 1000
+samplesize <- 40
+sim <- matrix(rexp(numsims*samplesize, rate=lambda), numsims, samplesize)
+row_means <- rowMeans(sim)
+```
+
+###Center and Variability of the Distribution
+
+####Center
+The mean of the distribution of the sample means is `r round(mean(row_means),2)`, and the theoretical center of the distribution is `r 1/lambda`. 
+
+The center of distribution of averages of 40 exponentials is close to the theoretical center of the distribution.
+
+####Variability
+The standard deviation of the distribution of the sample means is `r round(sd(row_means),2)` whereas the theoretical standard deviation of the distribution is `r round((1/lambda)/sqrt(samplesize),2)`.
+
+The variability in distribution of averages of 40 exponentials is close to the theoretical variance of the distribution.
+
+### Distribution of Simulated Data Compared to Theortical Distribution
+Due to the central limit theorem, the averages of samples follow normal distribution. The figure below shows the density computed using the histogram and the normal density plotted with theoretical mean and variance values. 
+```{r,echo=FALSE}
+# plot the histogram of averages
+hist(row_means, breaks=50, prob=TRUE,main="Distribution of Averages Exponential Distribution (lambda=0.2)",xlab="")
+
+# density of the averages of samples
+lines(density(row_means))
+
+# theoretical center of distribution
+abline(v=1/lambda, col="red")
+
+# theoretical density of the averages of samples
+xfit <- seq(min(row_means), max(row_means), length=100)
+yfit <- dnorm(xfit, mean=1/lambda, sd=(1/lambda/sqrt(samplesize)))
+lines(xfit, yfit, pch=22, col="red", lty=2)
+
+# add legend
+legend('topright', c("simulation", "theoretical"), lty=c(1,2), col=c("black", "red"))
+```
+
+### Quantile-Quantile Plot 
+As shown with the Q-Q plot below, the distribution of averages of 40 exponentials is very close to a normal distribution.
+```{r,echo=FALSE}
+##Plot the QQ plot of the means
+qqnorm(row_means)
+qqline(row_means, col = 2)
+```
