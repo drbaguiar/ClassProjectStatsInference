@@ -1,0 +1,4 @@
+ClassProjectStatsInference
+==========================
+
+Class project
