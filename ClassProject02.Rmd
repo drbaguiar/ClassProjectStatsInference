@@ -1,0 +1,97 @@
+---
+title: "Statistical Inference Project 2"
+author: ""
+date: "Thursday, November 13, 2014"
+output: pdf_document
+---
+###Requirements
+Now in the second portion of the class, we're going to analyze the ToothGrowth data in the R datasets package. 
+
+        1. Load the ToothGrowth data and perform some basic exploratory data analyses 
+
+        2.  Provide a basic summary of the data.
+
+        3.  Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. (Only use the techniques from class, even if there's other approaches worth considering)
+
+        4.  State your conclusions and the assumptions needed for your conclusions. 
+
+Some criteria that you will be evaluated on
+
+        *Did you  perform an exploratory data analysis of at least a single plot or table highlighting basic features of the data?
+
+        *Did the student perform some relevant confidence intervals and/or tests?
+
+        *Were the results of the tests and/or intervals interpreted in the context of the problem correctly? 
+
+        *Did the student describe the assumptions needed for their conclusions?
+```{r,warning=FALSE}
+#Set globals, load libraries, and load and attach the data
+# Turn off scientific notations for numbers
+options(scipen = 999)  
+
+if(!require("doBy")){
+        Install.packages("doBy")
+}
+
+##Attach the Data
+attach(ToothGrowth)
+```
+###Exploratory Data Analysis
+The ToothGrowth dataset consists of `r nrow(ToothGrowth)` observations on `r length(ToothGrowth)` variables:
+        
+        len      numeric	Tooth length
+        supp	 factor	        Supplement type (VC or OJ).
+        dose	 numeric	Dose in milligrams.
+
+The ToothGrowth dataset explains the relation between the length of teeth in each of 10 guinea pigs at each of three dose levels of Vitamin C (0.5, 1 and 2 mg) with each of two supplement types (orange juice and ascorbic acid). 
+```{r,echo=FALSE}
+with(ToothGrowth, {
+    boxplot(len ~ dose, boxwex = 0.25, at = 1:3 - 0.2,
+            subset = (supp == "VC"), col = "yellow",
+            main = "Guinea Pigs' Tooth Growth",
+            xlab = "Vitamin C dose mg",
+            ylab = "tooth length", ylim = c(0, 35))
+    boxplot(len ~ dose, add = TRUE, boxwex = 0.25, at = 1:3 + 0.2,
+            subset = supp == "OJ", col = "orange")
+    legend(2, 9, c("Ascorbic acid", "Orange juice"),
+           fill = c("yellow", "orange"))
+})
+```
+
+The boxplot above indicates that, on average, the length of the tooth increases as the dose also increases.  Supplement type appears to make a difference at the 0.5 and 1 mg levels, but not at the 2 mg level.
+
+###Basic Summary of the Data 
+Below, I have calculated the mean and standard deviation for the length of the tooth by dose and supplement type. 
+```{r}
+summaryBy(len~dose+supp, data=ToothGrowth, FUN=c(mean,sd,length))
+```
+
+The summary data above indicates that, on average, the length of the tooth increases as the dose also increases.  Supplement type appears to make a difference at the 0.5 and 1 mg levels, but not at the 2 mg level.
+
+###Hypothesis Tests and Confidence Intervals
+The first hypothesis test was that there was no difference in tooth length between orange juice and ascorbic acid.  The alternative hypothesis was that orange juice increased tooth length more than ascorbic acid did.
+```{r}
+results <-t.test(len[supp=="OJ"],len[supp=="VC"],paired=TRUE, alternative = c("greater"))
+results
+```
+
+The t-value of `r round(results$statistic,3)` with a p-value of `r round(results$p.value,4)` indicated that the null hypothesis should be rejected.  There is evidence to suggest that orange juice increased tooth length more than ascorbic acid did.
+
+The null hypothesis for the second test was that there was no difference in tooth length between 2 mg and 1 mg dose levels.  The alternative hypothesis was that the 2 mg dose increased tooth length more than 1 mg dose did.
+```{r}
+results <-t.test(len[dose==2],len[dose==1],paired=TRUE, alternative = c("greater"))
+results
+```
+
+The t-value of `r round(results$statistic,3)` with a p-value of `r round(results$p.value,4)` indicated that the null hypothesis should be rejected.  There is evidence to suggest that the 2 mg dose increased tooth length more than 1 mg dose did. 
+
+The null hypothesis for the final test was that there was no difference in tooth length between the 1 mg and .5 mg dose levels.  The alternative hypothesis was that the 1 mg dose increased tooth length more than .5 mg dose did.
+```{r}
+results <-t.test(len[dose==1],len[dose==.5],paired=TRUE, alternative = c("greater"))
+results
+```
+
+The t-value of `r round(results$statistic,3)` with a p-value of `r round(results$p.value,4)` indicated that the null hypothesis should be rejected.  There is evidence to suggest that the  1 mg dose increased tooth length more than .5 mg dose did. 
+
+###Conclusions and the Assumptions 
+With the values obtained, it can be assumed that there is a different in the growth of the tooth while the doses are larger. There is also evidence to suggest that supplement type has an effect on tooth growth.  
