@@ -1,8 +1,8 @@
 ---
 title: "Statistical Inference Project 2"
-author: ""
+author: ''
 date: "Thursday, November 13, 2014"
-output: pdf_document
+output: html_document
 ---
 ###Requirements
 Now in the second portion of the class, we're going to analyze the ToothGrowth data in the R datasets package. 
